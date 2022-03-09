@@ -1,11 +1,16 @@
 workflows:
   simple-workflow:
     name: Native Android
-    max_build_duration: 100
+    max_build_duration: 60
     triggering:
       events:
         - push
+        - tag
         - pull_request
+      branch_patterns:
+        - pattern: release
+          include: true
+          source: true
     scripts:
       - name: Build debug apk
         script: ./gradlew assembleDebug
