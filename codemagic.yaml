@@ -7,6 +7,7 @@ workflows:
         - push
         - pull_request
       branch_patterns:
+        - pattern: dev
         - pattern: master
       cancel_previous_builds: true
     scripts:
