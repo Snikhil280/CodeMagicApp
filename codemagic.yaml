@@ -2,6 +2,10 @@ workflows:
   simple-workflow:
     name: Native Android
     max_build_duration: 60
+    environment:
+      groups:
+        - keystore_credentials
+      node: latest
     triggering:
       events:
         - push
@@ -11,10 +15,23 @@ workflows:
         - pattern: master
       cancel_previous_builds: true
     scripts:
-      - name: Build debug apk
-        script: ./gradlew assembleDebug
-    artifacts:
-      - app/build/**/outputs/**/*.apk
+      - name: Set up local properties
+        script: echo "sdk.dir=$ANDROID_SDK_ROOT" > "$FCI_BUILD_DIR/local.properties"
+      - name: Set up key.properties file for code signing
+        script: |
+          echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
+          cat >> "$FCI_BUILD_DIR/android/key.properties" <<EOF
+          storePassword=$CM_KEYSTORE_PASSWORD
+          keyPassword=$CM_KEY_PASSWORD
+          keyAlias=$CM_KEY_ALIAS
+          storeFile=$CM_KEYSTORE_PATH
+          EOF
+      - name: Build Android app
+        script:
+          ./gradlew assembleRelease
+      artifacts:
+        - app/build/outputs/**/**/*.aab
+        - app/build/outputs/**/**/*.apk
     publishing:
       email:
         recipients:
