@@ -29,9 +29,8 @@ workflows:
       - name: Build Android app
         script:
           ./gradlew assembleRelease
-      artifacts:
-        - app/build/outputs/**/**/*.aab
-        - app/build/outputs/**/**/*.apk
+    artifacts:
+      - app/build/outputs/**/**/*.apk
     publishing:
       email:
         recipients:
